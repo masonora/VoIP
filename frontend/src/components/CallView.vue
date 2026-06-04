@@ -202,6 +202,10 @@ export default {
       var callPannel = this
       if (tokenData) {
         if (tokenData.type === 'twilio') {
+          if (!window.isSecureContext) {
+            this.$swal.fire('Voice calls unavailable', 'Voice calls require HTTPS. Please access this application over a secure (HTTPS) connection.', 'warning')
+            return
+          }
           this.callType = 'twilio'
           Device.setup(tokenData.token)
           Device.incoming((connection) => {
@@ -230,8 +234,8 @@ export default {
             // callPannel.$refs['my-modal'].hide()
           })
           Device.error((error) => {
-            console.log('error')
-            console.log(error)
+            console.log('Twilio Device error', error)
+            this.$swal.fire('Voice call error', error.message || 'An error occurred with the voice call device.', 'error')
           })
         } else if (tokenData.type === 'telnyx' && tokenData.setting.sip_username && tokenData.setting.sip_password) {
           this.callType = 'telnyx'
