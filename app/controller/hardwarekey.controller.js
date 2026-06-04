@@ -1,7 +1,7 @@
 const U2F = require("u2f");
 const base64url = require('base64url');
 var baseUrl = process.env.BASE_URL.trim()
-const APP_ID = baseUrl.substr(0, baseUrl.length - 1);
+const RP_ID = new URL(baseUrl).hostname;
 var Hardwarekey = require('../model/hardwarekey.model');
 var User = require('../model/user.model');
 var Handel = require('../model/handel.model');
@@ -43,7 +43,8 @@ exports.register = async (req, res) => {
         var publicKey = {
             challenge: sessData.challenge,
             'rp': {
-                'name': 'Operation Privacy'
+                'name': 'Operation Privacy',
+                'id': RP_ID
             },
             'user': {
                 'id': user.id,
@@ -125,6 +126,7 @@ exports.loginSession = async (req, res) => {
         sessData.challenge = base64url.encode(await generateRandomBuffer(32));
         var publicKey = {
             'challenge': sessData.challenge,
+            'rpId': RP_ID,
             'status': 'ok'
         }
         let user = await getUser(sessData.title, sessData.user);
